@@ -1,0 +1,37 @@
+name: Patch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  patch:
+    runs-on: macos-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Check signature
+        run: |
+          pkgutil --check-signature RosettaUpdateAuto.pkg
+          pkgutil --check-signature RosettaUpdateAuto.pkg | head -n 2 | tail -n 1 | grep -E '^\s+Status: signed Apple Software$' >/dev/null
+
+      - name: Extract
+        run: |
+          pkgutil --expand-full RosettaUpdateAuto.pkg RosettaUpdateAuto.pkg-expanded
+          cp RosettaUpdateAuto.pkg-expanded/RosettaUpdateAuto.pkg/Payload/Library/Apple/usr/libexec/oah/RosettaLinux/rosetta ./rosetta
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: unpatched
+          path: rosetta
+
+      - name: Patch
+        run: |
+          dd if=<(printf '\x1f\x20\x03\xd5') of='rosetta' bs=1 seek=170700 conv=notrunc
+          dd if=<(printf '\x1f\x20\x03\xd5') of='rosetta' bs=1 seek=170728 conv=notrunc
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: patched
+          path: rosetta
