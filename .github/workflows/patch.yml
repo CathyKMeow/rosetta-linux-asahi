@@ -28,8 +28,8 @@ jobs:
 
       - name: Patch
         run: |
-          dd if=<(printf '\x1f\x20\x03\xd5') of='rosetta' bs=1 seek=170700 conv=notrunc
-          dd if=<(printf '\x1f\x20\x03\xd5') of='rosetta' bs=1 seek=170728 conv=notrunc
+          dd if=<(printf '\x1f\x20\x03\xd5') of='rosetta' bs=1 seek=170828 conv=notrunc
+          dd if=<(printf '\x1f\x20\x03\xd5') of='rosetta' bs=1 seek=170856 conv=notrunc
 
       - uses: actions/upload-artifact@v3
         with:
